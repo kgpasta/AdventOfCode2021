@@ -1,9 +1,3 @@
-lines =
-  File.read!("puzzle3.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> Enum.map(fn x -> String.codepoints(x) |> Enum.map(fn y -> elem(Integer.parse(y), 0) end) end)
-
 defmodule Bits do
   def get_most_common_bits(list, is_greater, is_less) do
     starting_count = Enum.count(hd(list))
@@ -40,24 +34,34 @@ defmodule Bits do
       filter_most_common_bits(filtered_trailed_list, index + 1, func)
     end
   end
+
+  def solve do
+    lines =
+      File.read!("puzzles/puzzle3.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn x ->
+        String.codepoints(x) |> Enum.map(fn y -> elem(Integer.parse(y), 0) end)
+      end)
+
+    gamma_bits = Bits.get_most_common_bits(lines, 0, 1)
+    gamma = Bits.binary_list_to_integer(gamma_bits)
+
+    epsilon_bits = Bits.get_most_common_bits(lines, 1, 0)
+    epsilon = Bits.binary_list_to_integer(epsilon_bits)
+
+    IO.puts("Part1: #{gamma} gamma, #{epsilon} epsilon, #{gamma * epsilon} multiplied")
+
+    oxygen_bits =
+      Bits.filter_most_common_bits(lines, 0, fn x -> Bits.get_most_common_bits(x, 0, 1) end)
+
+    oxygen = Bits.binary_list_to_integer(oxygen_bits)
+
+    scrubber_bits =
+      Bits.filter_most_common_bits(lines, 0, fn x -> Bits.get_most_common_bits(x, 1, 0) end)
+
+    scrubber = Bits.binary_list_to_integer(scrubber_bits)
+
+    IO.puts("Part1: #{oxygen} oxygen, #{scrubber} co2 scrubber, #{oxygen * scrubber} multiplied")
+  end
 end
-
-gamma_bits = Bits.get_most_common_bits(lines, 0, 1)
-gamma = Bits.binary_list_to_integer(gamma_bits)
-
-epsilon_bits = Bits.get_most_common_bits(lines, 1, 0)
-epsilon = Bits.binary_list_to_integer(epsilon_bits)
-
-IO.puts("Part1: #{gamma} gamma, #{epsilon} epsilon, #{gamma * epsilon} multiplied")
-
-oxygen_bits =
-  Bits.filter_most_common_bits(lines, 0, fn x -> Bits.get_most_common_bits(x, 0, 1) end)
-
-oxygen = Bits.binary_list_to_integer(oxygen_bits)
-
-scrubber_bits =
-  Bits.filter_most_common_bits(lines, 0, fn x -> Bits.get_most_common_bits(x, 1, 0) end)
-
-scrubber = Bits.binary_list_to_integer(scrubber_bits)
-
-IO.puts("Part1: #{oxygen} oxygen, #{scrubber} co2 scrubber, #{oxygen * scrubber} multiplied")

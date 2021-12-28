@@ -1,11 +1,3 @@
-line =
-  File.read!("puzzle6.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> hd()
-  |> String.split(",")
-  |> Enum.map(&String.to_integer/1)
-
 defmodule LanternFish do
   @reproduction_days 6
   @starting_days 2
@@ -36,21 +28,29 @@ defmodule LanternFish do
       get_new_offspring_list(new_buckets, days_left + 1, total_days)
     end
   end
+
+  def solve do
+    line =
+      File.read!("puzzles/puzzle6.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> hd()
+      |> String.split(",")
+      |> Enum.map(&String.to_integer/1)
+
+    buckets = LanternFish.organize_list_into_buckets(line)
+    observation_days = 80
+    new_list = LanternFish.get_new_offspring_list(buckets, 1, observation_days)
+
+    total_sum = Enum.map(new_list, fn {_key, val} -> val end) |> Enum.sum()
+
+    IO.puts("Part1: #{total_sum} number of lanternfish")
+
+    second_observation_days = 256
+    second_list = LanternFish.get_new_offspring_list(buckets, 1, second_observation_days)
+
+    second_sum = Enum.map(second_list, fn {_key, val} -> val end) |> Enum.sum()
+
+    IO.puts("Part2: #{second_sum} number of lanternfish")
+  end
 end
-
-buckets = LanternFish.organize_list_into_buckets(line)
-observation_days = 80
-new_list = LanternFish.get_new_offspring_list(buckets, 1, observation_days)
-
-total_sum =
-  Enum.map(new_list, fn {_key, val} -> val end) |> Enum.sum()
-
-IO.puts("Part1: #{total_sum} number of lanternfish")
-
-second_observation_days = 256
-second_list = LanternFish.get_new_offspring_list(buckets, 1, second_observation_days)
-
-second_sum =
-  Enum.map(second_list, fn {_key, val} -> val end) |> Enum.sum()
-
-IO.puts("Part2: #{second_sum} number of lanternfish")

@@ -1,9 +1,3 @@
-input =
-  File.read!("puzzle12.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> Enum.map(fn x -> String.split(x, "-") |> List.to_tuple() end)
-
 defmodule Caves do
   def create_graph(lines) do
     Enum.reduce(lines, %{}, fn {point1, point2}, acc ->
@@ -55,10 +49,18 @@ defmodule Caves do
       end
     end)
   end
+
+  def solve() do
+    input =
+      File.read!("puzzles/puzzle12.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn x -> String.split(x, "-") |> List.to_tuple() end)
+
+    paths = Caves.parse_paths(input, 1)
+    IO.puts("Part1: #{Enum.count(paths)} paths")
+
+    two_paths = Caves.parse_paths(input, 2)
+    IO.puts("Part2: #{Enum.count(two_paths)} paths")
+  end
 end
-
-paths = Caves.parse_paths(input, 1)
-IO.puts("Part1: #{Enum.count(paths)} paths")
-
-two_paths = Caves.parse_paths(input, 2)
-IO.puts("Part2: #{Enum.count(two_paths)} paths")

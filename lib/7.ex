@@ -1,11 +1,3 @@
-line =
-  File.read!("puzzle7.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> hd()
-  |> String.split(",")
-  |> Enum.map(&String.to_integer/1)
-
 defmodule CrabSubmarines do
   def organize_list_into_buckets(list) do
     Enum.reduce(list, %{}, fn x, acc -> Map.update(acc, x, 1, fn x -> x + 1 end) end)
@@ -54,11 +46,21 @@ defmodule CrabSubmarines do
   def exp_distance_from_point(point, list) do
     Enum.map(list, fn x -> abs(point - x) |> exp_distance() end) |> Enum.sum()
   end
+
+  def solve() do
+    line =
+      File.read!("puzzles/puzzle7.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> hd()
+      |> String.split(",")
+      |> Enum.map(&String.to_integer/1)
+
+    distance = CrabSubmarines.get_median(line) |> CrabSubmarines.distance_from_point(line)
+    IO.puts("Part1: #{distance} fuel expended")
+
+    {distance_two, _position} = CrabSubmarines.get_smallest_distance(line)
+
+    IO.puts("Part2: #{distance_two} fuel expended")
+  end
 end
-
-distance = CrabSubmarines.get_median(line) |> CrabSubmarines.distance_from_point(line)
-IO.puts("Part1: #{distance} fuel expended")
-
-{distance_two, _position} = CrabSubmarines.get_smallest_distance(line)
-
-IO.puts("Part2: #{distance_two} fuel expended")

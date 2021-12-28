@@ -1,8 +1,3 @@
-lines =
-  File.read!("puzzle4.txt")
-  |> String.trim()
-  |> String.split("\n")
-
 defmodule Bingo do
   def map_strings_to_integers(list) do
     Enum.filter(list, fn x -> String.trim(x) != "" end)
@@ -82,31 +77,41 @@ defmodule Bingo do
     end)
     |> Enum.sum()
   end
+
+  def solve() do
+    lines =
+      File.read!("puzzles/puzzle4.txt")
+      |> String.trim()
+      |> String.split("\n")
+
+    numbers_drawn = hd(lines) |> String.split(",") |> Bingo.map_strings_to_integers()
+
+    boards =
+      tl(lines)
+      |> Enum.filter(fn x -> String.trim(x) != "" end)
+      |> Enum.map(fn x ->
+        String.trim(x) |> String.split(" ") |> Bingo.map_strings_to_integers()
+      end)
+      |> Enum.chunk_every(5)
+
+    board_scorers = List.duplicate(List.duplicate([0, 0, 0, 0, 0], 5), Enum.count(boards))
+
+    {number, winning_board, winning_scorer} =
+      Bingo.play_bingo(numbers_drawn, boards, board_scorers)
+
+    unmarked_sum = Bingo.calculate_unmarked_sum(winning_board, winning_scorer)
+
+    IO.puts(
+      "Part1: #{number} winning number, #{unmarked_sum} unmarked sum, #{number * unmarked_sum} score"
+    )
+
+    {last_number, last_winning_board, last_winning_scorer} =
+      Bingo.play_bingo_till_end(numbers_drawn, boards, board_scorers)
+
+    last_unmarked_sum = Bingo.calculate_unmarked_sum(last_winning_board, last_winning_scorer)
+
+    IO.puts(
+      "#{last_number} last winning number, #{last_unmarked_sum} last unmarked sum, #{last_number * last_unmarked_sum} last score"
+    )
+  end
 end
-
-numbers_drawn = hd(lines) |> String.split(",") |> Bingo.map_strings_to_integers()
-
-boards =
-  tl(lines)
-  |> Enum.filter(fn x -> String.trim(x) != "" end)
-  |> Enum.map(fn x -> String.trim(x) |> String.split(" ") |> Bingo.map_strings_to_integers() end)
-  |> Enum.chunk_every(5)
-
-board_scorers = List.duplicate(List.duplicate([0, 0, 0, 0, 0], 5), Enum.count(boards))
-
-{number, winning_board, winning_scorer} = Bingo.play_bingo(numbers_drawn, boards, board_scorers)
-
-unmarked_sum = Bingo.calculate_unmarked_sum(winning_board, winning_scorer)
-
-IO.puts(
-  "Part1: #{number} winning number, #{unmarked_sum} unmarked sum, #{number * unmarked_sum} score"
-)
-
-{last_number, last_winning_board, last_winning_scorer} =
-  Bingo.play_bingo_till_end(numbers_drawn, boards, board_scorers)
-
-last_unmarked_sum = Bingo.calculate_unmarked_sum(last_winning_board, last_winning_scorer)
-
-IO.puts(
-  "#{last_number} last winning number, #{last_unmarked_sum} last unmarked sum, #{last_number * last_unmarked_sum} last score"
-)

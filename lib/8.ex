@@ -1,11 +1,3 @@
-list =
-  File.read!("puzzle8.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> Enum.map(fn x ->
-    List.to_tuple(String.split(x, " | ") |> Enum.map(fn y -> String.split(y, " ") end))
-  end)
-
 defmodule SevenSegment do
   @unique_segment_size_to_val %{2 => 1, 3 => 7, 4 => 4, 7 => 8}
   @number_to_segments %{
@@ -120,25 +112,24 @@ defmodule SevenSegment do
   end
 
   def translate_segments(line, letter_map) do
-      Enum.map(line, fn x ->
-        String.codepoints(x)
-        |> Enum.map(fn y ->
-          letter_map[y]
-        end)
-        |> Enum.join("")
+    Enum.map(line, fn x ->
+      String.codepoints(x)
+      |> Enum.map(fn y ->
+        letter_map[y]
       end)
+      |> Enum.join("")
+    end)
   end
 
   def convert_segments_to_number(segments) do
-
-      Enum.map(segments, fn x ->
-        Enum.find_value(@number_to_segments, fn {num, str} ->
-          if is_same_letters(x, str), do: num, else: nil
-        end)
+    Enum.map(segments, fn x ->
+      Enum.find_value(@number_to_segments, fn {num, str} ->
+        if is_same_letters(x, str), do: num, else: nil
       end)
-      |> Enum.join("")
-      |> Integer.parse(10)
-      |> elem(0)
+    end)
+    |> Enum.join("")
+    |> Integer.parse(10)
+    |> elem(0)
   end
 
   def translate_lines(lines) do
@@ -154,12 +145,22 @@ defmodule SevenSegment do
     translate_segments(elem(line, 1), letter_map)
     |> convert_segments_to_number()
   end
+
+  def solve() do
+    list =
+      File.read!("puzzles/puzzle8.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn x ->
+        List.to_tuple(String.split(x, " | ") |> Enum.map(fn y -> String.split(y, " ") end))
+      end)
+
+    unique_number_frequency = SevenSegment.get_unique_number_frequency(list)
+
+    IO.puts("Part1: #{unique_number_frequency} frequency")
+
+    translated_lines = SevenSegment.translate_lines(list)
+
+    IO.puts("Part2: #{Enum.sum(translated_lines)} total sum")
+  end
 end
-
-unique_number_frequency = SevenSegment.get_unique_number_frequency(list)
-
-IO.puts("Part1: #{unique_number_frequency} frequency")
-
-translated_lines = SevenSegment.translate_lines(list)
-
-IO.puts("Part2: #{Enum.sum(translated_lines)} total sum")

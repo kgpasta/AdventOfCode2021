@@ -1,18 +1,3 @@
-grid =
-  File.read!("puzzle9.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> Enum.map(fn x ->
-    String.codepoints(x) |> Enum.map(fn y -> Integer.parse(y, 10) |> elem(0) end)
-  end)
-  |> Enum.with_index()
-  |> Enum.reduce(%{}, fn {list, y}, acc ->
-    Enum.with_index(list)
-    |> Enum.map(fn {val, x} -> {{x, y}, val} end)
-    |> Map.new()
-    |> Map.merge(acc)
-  end)
-
 defmodule SmokeBasin do
   def get_adjacent_points({x, y}, grid) do
     Enum.map([{0, 1}, {1, 0}, {-1, 0}, {0, -1}], fn {diff_x, diff_y} ->
@@ -83,7 +68,7 @@ defmodule SmokeBasin do
 
       Enum.reduce(adjacent_points, new_basin_points, fn x, acc ->
         MapSet.union(acc, find_basin(grid, x, acc))
-       end)
+      end)
     end
   end
 
@@ -92,12 +77,29 @@ defmodule SmokeBasin do
     |> Enum.slice(0, 3)
     |> Enum.map(fn x -> Enum.count(x) end)
   end
+
+  def solve() do
+    grid =
+      File.read!("puzzles/puzzle9.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn x ->
+        String.codepoints(x) |> Enum.map(fn y -> Integer.parse(y, 10) |> elem(0) end)
+      end)
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {list, y}, acc ->
+        Enum.with_index(list)
+        |> Enum.map(fn {val, x} -> {{x, y}, val} end)
+        |> Map.new()
+        |> Map.merge(acc)
+      end)
+
+    {_explored, low_points} = SmokeBasin.get_low_points(grid)
+    risk_levels = SmokeBasin.get_risk_levels(grid, low_points)
+    IO.puts("Part1: #{Enum.sum(risk_levels)} risk levels")
+
+    basins = SmokeBasin.find_basins(grid, low_points)
+    top_3 = SmokeBasin.get_top_3(basins)
+    IO.puts("Part2: #{Enum.product(top_3)} basin sizes")
+  end
 end
-
-{_explored, low_points} = SmokeBasin.get_low_points(grid)
-risk_levels = SmokeBasin.get_risk_levels(grid, low_points)
-IO.puts("Part1: #{Enum.sum(risk_levels)} risk levels")
-
-basins = SmokeBasin.find_basins(grid, low_points)
-top_3 = SmokeBasin.get_top_3(basins)
-IO.puts("Part2: #{Enum.product(top_3)} basin sizes")

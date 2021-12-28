@@ -1,18 +1,3 @@
-input =
-  File.read!("puzzle11.txt")
-  |> String.trim()
-  |> String.split("\n")
-  |> Enum.map(fn x ->
-    String.codepoints(x) |> Enum.map(fn y -> Integer.parse(y, 10) |> elem(0) end)
-  end)
-  |> Enum.with_index()
-  |> Enum.reduce(%{}, fn {list, y}, acc ->
-    Enum.with_index(list)
-    |> Enum.map(fn {val, x} -> {{x, y}, val} end)
-    |> Map.new()
-    |> Map.merge(acc)
-  end)
-
 defmodule OctopusFlash do
   @flash_point 10
   def get_neighbors(grid, {x, y}) do
@@ -83,10 +68,27 @@ defmodule OctopusFlash do
       get_first_simultaneous(reset_g, steps_taken + 1)
     end
   end
+
+  def solve() do
+    input =
+      File.read!("puzzles/puzzle11.txt")
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(fn x ->
+        String.codepoints(x) |> Enum.map(fn y -> Integer.parse(y, 10) |> elem(0) end)
+      end)
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {list, y}, acc ->
+        Enum.with_index(list)
+        |> Enum.map(fn {val, x} -> {{x, y}, val} end)
+        |> Map.new()
+        |> Map.merge(acc)
+      end)
+
+    {_new_grid, flashes} = OctopusFlash.calculate_steps(input, 0, 0, 100)
+    IO.puts("Part1: #{flashes} flashes")
+
+    steps = OctopusFlash.get_first_simultaneous(input, 0)
+    IO.puts("Part2: #{steps} steps")
+  end
 end
-
-{_new_grid, flashes} = OctopusFlash.calculate_steps(input, 0, 0, 100)
-IO.puts("Part1: #{flashes} flashes")
-
-steps = OctopusFlash.get_first_simultaneous(input, 0)
-IO.puts("Part2: #{steps} steps")

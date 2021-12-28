@@ -1,8 +1,3 @@
-input =
-  File.read!("puzzle10.txt")
-  |> String.trim()
-  |> String.split("\n")
-
 defmodule SyntaxParser do
   @openers ["(", "[", "{", "<"]
   @closers [")", "]", "}", ">"]
@@ -83,14 +78,24 @@ defmodule SyntaxParser do
       acc * 5 + val
     end)
   end
+
+  def solve() do
+    input =
+      File.read!("puzzles/puzzle10.txt")
+      |> String.trim()
+      |> String.split("\n")
+
+    corrupted_line_score =
+      SyntaxParser.find_corrupted_lines(input) |> SyntaxParser.score_corrupted()
+
+    IO.puts("Part1: #{corrupted_line_score} error score")
+
+    sorted_scores =
+      SyntaxParser.find_incomplete_lines(input)
+      |> Enum.map(fn x -> SyntaxParser.complete_line(x) |> SyntaxParser.score_line() end)
+      |> Enum.sort()
+
+    middle_score = Enum.at(sorted_scores, floor(Enum.count(sorted_scores) / 2))
+    IO.puts("Part2: #{middle_score} middle score")
+  end
 end
-
-corrupted_line_score = SyntaxParser.find_corrupted_lines(input) |> SyntaxParser.score_corrupted()
-IO.puts("Part1: #{corrupted_line_score} error score")
-
-sorted_scores =
-  SyntaxParser.find_incomplete_lines(input)
-  |> Enum.map(fn x -> SyntaxParser.complete_line(x) |> SyntaxParser.score_line() end)
-  |> Enum.sort()
-middle_score = Enum.at(sorted_scores, floor(Enum.count(sorted_scores) / 2))
-IO.puts("Part2: #{middle_score} middle score")
